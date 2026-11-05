@@ -66,7 +66,7 @@ background:conic-gradient(from var(--wlga),color-mix(in srgb,var(--wlgc) 35%,#12
 .okp-fab-ico{width:32px;height:32px;border-radius:50%;background:#121014;color:#D7FF3A;display:grid;place-items:center;flex:0 0 auto}
 .okp-fab-ico svg{width:14px;height:14px;fill:currentColor}
 .okp-fab-txt{display:flex;flex-direction:column;line-height:1.05;text-align:left;min-width:0}
-.okp-fab-txt b{font-family:'Permanent Marker',cursive;font-size:15px;font-weight:400;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+.okp-fab-txt b{font-family:'Permanent Marker',cursive;font-size:15px;font-weight:400;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:min(180px,42vw)}
 .okp-fab-txt span{font-size:11px;font-weight:700;opacity:.75}
 .okp-eq{display:inline-flex;align-items:flex-end;gap:2px;height:14px;margin-left:2px;flex:0 0 auto}
 .okp-eq i{display:block;width:3px;background:#121014;border-radius:1px;height:4px;transform-origin:bottom}
@@ -82,7 +82,7 @@ background:conic-gradient(from var(--wlga),color-mix(in srgb,var(--wlgc) 35%,#12
 .okp-top{display:flex;align-items:flex-start;gap:10px}
 .okp-badge{flex:0 0 auto;background:#D7FF3A;border:2.5px solid #121014;border-radius:12px;padding:6px 8px;font-family:'Permanent Marker',cursive;font-size:12px;line-height:1;transform:rotate(-3deg);box-shadow:2px 2px 0 #121014}
 .okp-meta{flex:1;min-width:0;padding-top:2px}
-.okp-title{font-family:'Permanent Marker',cursive;font-size:17px;line-height:1.1;margin:0;color:#121014;word-wrap:break-word}
+.okp-title{font-family:'Permanent Marker',cursive;font-size:17px;line-height:1.1;margin:0;color:#121014;word-wrap:break-word;overflow-wrap:anywhere}
 .okp-artist{font-size:12px;font-weight:700;margin-top:2px;color:#5A5260}
 .okp-close{flex:0 0 auto;width:34px;height:34px;border-radius:10px;border:2.5px solid #121014;background:#fff;cursor:pointer;display:grid;place-items:center;box-shadow:2px 2px 0 #121014}
 .okp-close:focus-visible,.okp-btn:focus-visible,.okp-seek:focus-visible,.okp-vol:focus-visible{outline:3px solid #FF2E9A;outline-offset:2px}
@@ -110,7 +110,7 @@ background:conic-gradient(from var(--wlga),color-mix(in srgb,var(--wlgc) 35%,#12
   .okp-panel{width:100%;transform:none;padding:12px}
   .okp-fab{transform:none;max-width:100%}
   .okp-fab:hover{transform:translateY(-2px)}
-  .okp-fab-txt b{max-width:150px}
+  .okp-fab-txt b{max-width:min(150px,48vw)}
   .okp-btn{width:36px;height:36px;border-radius:11px}
   .okp-title{font-size:16px}
 }
@@ -441,7 +441,8 @@ const WL_POST_ID = '2117081083615310206';
   if(!root) return;
   var TRACKS=[
     {src:'oddkind_name_on_the_wall.mp3', title:'Name on the Wall', artist:'Echo1', durHint:177},
-    {src:'oddkind_out_skunk_your_skunk.mp3', title:'Out-Skunk Your Skunk', artist:'Echo1', durHint:183}
+    {src:'oddkind_out_skunk_your_skunk.mp3', title:'Out-Skunk Your Skunk', artist:'Echo1', durHint:183},
+    {src:'oddkind_the_odd_kind.mp3', title:'The Odd Kind', artist:'Echo1', durHint:210}
   ];
   var aEl=document.getElementById('okaudio-a');
   var bEl=document.getElementById('okaudio-b');
