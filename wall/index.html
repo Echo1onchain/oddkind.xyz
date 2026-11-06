@@ -201,23 +201,36 @@ footer .by span{color:var(--lime);font-weight:600}
 @media (prefers-reduced-motion: reduce){.mqtr{animation:none}.can.shaking svg{animation:none}.pill,.chip,.cap,.save{transition:none}}
 @media (pointer:coarse){.keys{display:none}}
 
-/* Paint colors and stencils stay with the canvas. */
-.bench{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,332px);gap:18px 22px;align-items:start}
-.bench-main{min-width:0}
-.dock{display:flex;flex-direction:column;gap:14px;min-width:0}
+/* Paint stays beside the canvas. Stencil tray sits directly under the wall. */
+.bench{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,380px);grid-template-areas:"above above" "stage dock" "under under";gap:16px 22px;align-items:start}
+.above{grid-area:above;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;min-width:0}
+.above .card{padding:14px;gap:10px}
+.above .drip-head,.dock-paint .drip-head{margin:0}
+.above .card h2.drip-head img,.dock-paint h2.drip-head img{display:block;width:auto;height:48px;max-width:100%;margin:0}
+.stage{grid-area:stage;min-width:0}
+.stage .tray{margin-top:16px}
+.under{grid-area:under}
+.dock{grid-area:dock;display:flex;flex-direction:column;gap:14px;min-width:0}
 .dock-paint{background:var(--lime);color:var(--black);border:4px solid var(--black);border-radius:22px;box-shadow:8px 8px 0 var(--pink);padding:14px 14px 16px;display:flex;flex-direction:column;gap:10px}
 .dock-paint h3{margin:0;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
-.dock .tray{margin-top:0}
 .dock #caps,.dock #nozzles{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
 .dock .cap,.dock #nozzles .chip{flex:none}
 @media (min-width:901px){
-  .bench{position:sticky;top:8px;z-index:4}
-  .dock{max-height:calc(100vh - 24px);overflow:auto}
-  .dock #caps,.dock #nozzles{flex-wrap:wrap;overflow:visible}
+  .dock{position:sticky;top:8px;z-index:4}
+  .dock #caps{flex-wrap:wrap;overflow:visible}
+  .dock #nozzles{flex-wrap:nowrap;overflow:visible}
+  .dock-paint{padding-bottom:12px}
 }
 @media (max-width:900px){
-  .bench{grid-template-columns:1fr}
-  .dock{position:sticky;bottom:100px;z-index:35}
+  .bench{grid-template-columns:minmax(0,1fr);grid-template-areas:"above" "stage" "dock" "under"}
+  .above{grid-template-columns:1fr}
+  .above .card h2.drip-head img{height:36px}
+  .above .note{font-size:13px}
+  .bench .tray,.under,.above{min-width:0}
+  .under{flex-direction:column;align-items:flex-start;margin-top:0}
+  #saveBtn{order:-1}
+  .dock{position:static}
+  .dock #nozzles{flex-wrap:wrap;overflow:visible}
 }
 @media (max-width:600px){.nav nav{gap:16px}.nav nav .txt{display:none}.badge{top:-18px}.stage{padding-right:10px}.frame{box-shadow:8px 8px 0 var(--pink),-3px -3px 0 var(--lime);border-width:4px;border-radius:16px}}
 </style>
@@ -244,70 +257,8 @@ footer .by span{color:var(--lime);font-weight:600}
 
   <section class="max" aria-label="The wall">
   <div class="bench">
-    <div class="bench-main">
-    <div class="stage">
-      <p class="badge" aria-hidden="true">Your X banner</p>
-      <div class="frame" id="frame">
-        <canvas id="wall" width="1500" height="500"></canvas>
-        <canvas id="paint" width="1500" height="500" aria-label="Wall to spray paint on"></canvas>
-        <canvas id="shade" width="1500" height="500"></canvas>
-        <canvas id="overlay" width="1500" height="500"></canvas>
-      </div>
-    </div>
-    <div class="under">
-      <p class="hint"><span id="hint"><strong>Hold to spray.</strong> Linger in one spot and it drips. When the can sputters, shake it.</span>
-      <span class="keys"><kbd>S</kbd> shake &nbsp; <kbd>Z</kbd> undo &nbsp; <kbd>[</kbd> <kbd>]</kbd> size &nbsp; <kbd>Q</kbd> <kbd>E</kbd> turn sticker or stencil &nbsp; <kbd>-</kbd> <kbd>+</kbd> flow</span></p>
-      <div class="row" id="stencilBar" hidden><button class="save" id="liftBtn" type="button">Lift stencil</button><button class="pill" id="moveBtn" type="button" style="font:inherit;font-weight:700;cursor:pointer">Move stencil</button></div>
-      <div class="row" id="stickBar" hidden><label class="turn" for="turn"><span>Turn</span><input id="turn" type="range" min="-180" max="180" value="0" step="1"></label><button class="save" id="stickIt" type="button">Stick it</button><button class="pill" id="stickCancel" type="button" style="font:inherit;font-weight:700;cursor:pointer">Cancel</button></div>
-      <button class="save" id="saveBtn" type="button">Save X banner</button>
-    </div>
-    </div>
-    <aside class="dock" aria-label="Paint and stencils">
-      <div class="dock-paint">
-        <h3>Paint</h3>
-        <div class="row" id="caps"></div>
-        <h3>Nozzle</h3>
-        <div class="row" id="nozzles"></div>
-      </div>
-    <div class="tray" id="tray" role="region" aria-label="Face stencils">
-      <div class="tray-top">
-        <h2 class="tray-heading" id="faceStencilHead"><img class="tray-title-img" src="hdr-face-stencils.webp" alt="Face stencils" width="900" height="243" decoding="async"></h2><span class="sr">Stencils</span>
-        <div class="row" id="stencilTabs" role="group" aria-label="Stencil type">
-          <button class="chip" type="button" data-cat="face" aria-pressed="true">Faces</button>
-          <button class="chip" type="button" data-cat="shape" aria-pressed="false">Shapes</button>
-          <button class="chip" type="button" data-cat="word" aria-pressed="false">Words</button>
-        </div>
-        <div class="row" id="cutStyle" role="group" aria-label="Cut style"><span class="cutlbl">Cut</span>
-          <button class="chip" type="button" data-cut="lines" aria-pressed="true">Outline</button>
-          <button class="chip" type="button" data-cut="solid" aria-pressed="false">Solid</button>
-        </div>
-        <label class="tray-size" for="stencilSize"><span>Size</span><input id="stencilSize" type="range" min="140" max="470" value="300"></label>
-      </div>
-      <div class="strip-wrap">
-        <button class="sbtn" id="stripL" type="button" aria-label="Scroll stencils left">‹</button>
-        <div class="strip" id="faces"></div>
-        <button class="sbtn" id="stripR" type="button" aria-label="Scroll stencils right">›</button>
-      </div>
-    </div>
-  </section>
-    </aside>
-  </div>
-  </section>
-
-  <section class="max tools" aria-label="Tools">
-    <div class="card pink">
-      <h2 class="drip-head"><img src="hdr-01-grab-a-can.webp" alt="01 Grab a can" width="720" height="360" decoding="async"></h2>
-      <div class="row" style="justify-content:space-between"><label for="flow"><h3 style="margin:0">Paint flow</h3></label><span class="canlbl" id="flowLbl">Normal</span></div>
-      <input id="flow" type="range" min="15" max="200" value="100" aria-describedby="flowLbl">
-      <h3 id="h-can">Pressure</h3>
-      <div class="can" id="can">
-        <svg viewBox="0 0 34 54" aria-hidden="true"><rect x="12" y="1" width="10" height="7" rx="2" fill="#121014"/><rect x="9" y="7" width="16" height="6" rx="3" id="canCap" fill="#D7FF3A" stroke="#121014" stroke-width="2"/><rect x="4" y="12" width="26" height="40" rx="6" fill="#F4F1F6" stroke="#121014" stroke-width="3"/><rect x="4" y="24" width="26" height="12" fill="#121014"/><path d="M9 30 l4 -3 l3 4 l4 -4 l5 3" stroke="#D7FF3A" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
-        <div class="gauge" id="gauge" role="meter" aria-labelledby="h-can" aria-valuemin="0" aria-valuemax="100"><i id="gaugeFill"></i></div>
-      </div>
-      <div class="row"><button class="shake" id="shakeBtn" type="button">Shake can</button><span class="canlbl" id="canLbl">Full</span></div>
-    </div>
-
-    <div class="card lime">
+<div class="above" aria-label="Wall and clean">
+<div class="card lime">
       <h2 class="drip-head"><img src="hdr-02-pick-your-spot.webp" alt="02 Pick your spot" width="720" height="360" decoding="async"></h2>
       <h3>Wall</h3>
       <div class="row" id="walls">
@@ -338,8 +289,64 @@ footer .by span{color:var(--lime);font-weight:600}
       <p class="note">Dashed lines show where X covers your banner.</p>
     </div>
 
-  </section>
+</div>
+<div class="stage">
+      <p class="badge" aria-hidden="true">Your X banner</p>
+      <div class="frame" id="frame">
+        <canvas id="wall" width="1500" height="500"></canvas>
+        <canvas id="paint" width="1500" height="500" aria-label="Wall to spray paint on"></canvas>
+        <canvas id="shade" width="1500" height="500"></canvas>
+        <canvas id="overlay" width="1500" height="500"></canvas>
+      </div>
+<div class="tray" id="tray" role="region" aria-label="Face stencils">
+      <div class="tray-top">
+        <h2 class="tray-heading" id="faceStencilHead"><img class="tray-title-img" src="hdr-face-stencils.webp" alt="Face stencils" width="900" height="243" decoding="async"></h2><span class="sr">Stencils</span>
+        <div class="row" id="stencilTabs" role="group" aria-label="Stencil type">
+          <button class="chip" type="button" data-cat="face" aria-pressed="true">Faces</button>
+          <button class="chip" type="button" data-cat="shape" aria-pressed="false">Shapes</button>
+          <button class="chip" type="button" data-cat="word" aria-pressed="false">Words</button>
+        </div>
+        <div class="row" id="cutStyle" role="group" aria-label="Cut style"><span class="cutlbl">Cut</span>
+          <button class="chip" type="button" data-cut="lines" aria-pressed="true">Outline</button>
+          <button class="chip" type="button" data-cut="solid" aria-pressed="false">Solid</button>
+        </div>
+        <label class="tray-size" for="stencilSize"><span>Size</span><input id="stencilSize" type="range" min="140" max="470" value="300"></label>
+      </div>
+      <div class="strip-wrap">
+        <button class="sbtn" id="stripL" type="button" aria-label="Scroll stencils left">‹</button>
+        <div class="strip" id="faces"></div>
+        <button class="sbtn" id="stripR" type="button" aria-label="Scroll stencils right">›</button>
+      </div>
+    </div>
+    </div>
+<aside class="dock" aria-label="Paint">
+      <div class="dock-paint">
+<h2 class="drip-head"><img src="hdr-01-grab-a-can.webp" alt="01 Grab a can" width="720" height="360" decoding="async"></h2>
+                <h3>Paint</h3>
+        <div class="row" id="caps"></div>
+        <h3>Nozzle</h3>
+        <div class="row" id="nozzles"></div>
+      <div class="row" style="justify-content:space-between"><label for="flow"><h3 style="margin:0">Paint flow</h3></label><span class="canlbl" id="flowLbl">Normal</span></div>
+      <input id="flow" type="range" min="15" max="200" value="100" aria-describedby="flowLbl">
+      <h3 id="h-can">Pressure</h3>
+      <div class="can" id="can">
+        <svg viewBox="0 0 34 54" aria-hidden="true"><rect x="12" y="1" width="10" height="7" rx="2" fill="#121014"/><rect x="9" y="7" width="16" height="6" rx="3" id="canCap" fill="#D7FF3A" stroke="#121014" stroke-width="2"/><rect x="4" y="12" width="26" height="40" rx="6" fill="#F4F1F6" stroke="#121014" stroke-width="3"/><rect x="4" y="24" width="26" height="12" fill="#121014"/><path d="M9 30 l4 -3 l3 4 l4 -4 l5 3" stroke="#D7FF3A" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+        <div class="gauge" id="gauge" role="meter" aria-labelledby="h-can" aria-valuemin="0" aria-valuemax="100"><i id="gaugeFill"></i></div>
+      </div>
+      <div class="row"><button class="shake" id="shakeBtn" type="button">Shake can</button><span class="canlbl" id="canLbl">Full</span></div>
+      </div>
+    </aside>
 
+<div class="under">
+      <p class="hint"><span id="hint"><strong>Hold to spray.</strong> Linger in one spot and it drips. When the can sputters, shake it.</span>
+      <span class="keys"><kbd>S</kbd> shake &nbsp; <kbd>Z</kbd> undo &nbsp; <kbd>[</kbd> <kbd>]</kbd> size &nbsp; <kbd>Q</kbd> <kbd>E</kbd> turn sticker or stencil &nbsp; <kbd>-</kbd> <kbd>+</kbd> flow</span></p>
+      <div class="row" id="stencilBar" hidden><button class="save" id="liftBtn" type="button">Lift stencil</button><button class="pill" id="moveBtn" type="button" style="font:inherit;font-weight:700;cursor:pointer">Move stencil</button></div>
+      <div class="row" id="stickBar" hidden><label class="turn" for="turn"><span>Turn</span><input id="turn" type="range" min="-180" max="180" value="0" step="1"></label><button class="save" id="stickIt" type="button">Stick it</button><button class="pill" id="stickCancel" type="button" style="font:inherit;font-weight:700;cursor:pointer">Cancel</button></div>
+      <button class="save" id="saveBtn" type="button">Save X banner</button>
+    </div>
+  </div>
+
+  
   <div style="overflow:hidden;padding:20px 0"><div aria-hidden="true" class="mq"><div class="mqtr"><i class="mqt"></i><i class="mqt"></i><i class="mqt"></i><i class="mqt"></i><i class="mqt"></i><i class="mqt"></i></div></div></div>
 </main>
 
@@ -1757,25 +1764,24 @@ renderWall();updateGauge();requestAnimationFrame(loop);
   function overlap(a,b){return a.left<b.right-1&&a.right>b.left+1&&a.top<b.bottom-1&&a.bottom>b.top+1}
   function boxes(){
     var list=[];
-    ['#saveBtn','#undoBtn','#buffBtn','#shakeBtn','#liftBtn','#stickIt','#mClose'].forEach(function(sel){
+    ['#saveBtn','#tray','#undoBtn','#buffBtn','#shakeBtn','#liftBtn','#stickIt','#mClose'].forEach(function(sel){
       var el=document.querySelector(sel);
       if(!el||el.closest('[hidden]')) return;
       var r=el.getBoundingClientRect();
       if(r.width>2&&r.height>2) list.push(r);
     });
     var frame=document.getElementById('frame');
-    if(frame){
+    if(frame && window.innerWidth>=901){
       var r=frame.getBoundingClientRect();
       if(r.width>2){
         list.push({left:r.left+r.width*(1288/1500),right:r.left+r.width*(1472/1500),top:r.top+r.height*(360/500),bottom:r.top+r.height*(440/500)});
       }
     }
-    var dock=document.querySelector('.dock');
-    if(dock){
-      var d=dock.getBoundingClientRect();
+    var paint=document.querySelector('.dock-paint');
+    if(paint){
+      var d=paint.getBoundingClientRect();
       if(d.width>2&&d.bottom>0&&d.top<(window.innerHeight||0)){
-        var stripTop=Math.max(d.top, d.bottom-8);
-        list.push({left:d.left,right:d.right,top:stripTop,bottom:d.bottom});
+        list.push({left:d.left,right:d.right,top:Math.max(d.top, d.bottom-4),bottom:d.bottom});
       }
     }
     return list;
