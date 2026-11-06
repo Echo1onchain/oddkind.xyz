@@ -201,23 +201,27 @@ footer .by span{color:var(--lime);font-weight:600}
 @media (prefers-reduced-motion: reduce){.mqtr{animation:none}.can.shaking svg{animation:none}.pill,.chip,.cap,.save{transition:none}}
 @media (pointer:coarse){.keys{display:none}}
 
-/* Paint colors and stencils stay with the canvas. */
-.bench{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,332px);gap:18px 22px;align-items:start}
-.bench-main{min-width:0}
-.dock{display:flex;flex-direction:column;gap:14px;min-width:0}
+/* Paint stays beside the canvas. Stencil tray sits directly under the wall. */
+.bench{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,332px);grid-template-areas:"stage dock" "tray ." "under .";gap:16px 22px;align-items:start}
+.stage{grid-area:stage;min-width:0}
+.bench .tray{grid-area:tray;margin-top:0}
+.under{grid-area:under}
+.dock{grid-area:dock;display:flex;flex-direction:column;gap:14px;min-width:0}
 .dock-paint{background:var(--lime);color:var(--black);border:4px solid var(--black);border-radius:22px;box-shadow:8px 8px 0 var(--pink);padding:14px 14px 16px;display:flex;flex-direction:column;gap:10px}
 .dock-paint h3{margin:0;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
-.dock .tray{margin-top:0}
 .dock #caps,.dock #nozzles{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
 .dock .cap,.dock #nozzles .chip{flex:none}
 @media (min-width:901px){
-  .bench{position:sticky;top:8px;z-index:4}
-  .dock{max-height:calc(100vh - 24px);overflow:auto}
+  .dock{position:sticky;top:8px;max-height:calc(100vh - 24px);overflow:auto;z-index:4}
   .dock #caps,.dock #nozzles{flex-wrap:wrap;overflow:visible}
 }
 @media (max-width:900px){
-  .bench{grid-template-columns:1fr}
-  .dock{position:sticky;bottom:100px;z-index:35}
+  .bench{grid-template-columns:minmax(0,1fr);grid-template-areas:"stage" "tray" "dock" "under"}
+  .bench .tray,.under{min-width:0}
+  .under{flex-direction:column;align-items:flex-start;margin-top:0}
+  #saveBtn{order:-1}
+  .dock{position:static}
+  .dock #nozzles{flex-wrap:wrap;overflow:visible}
 }
 @media (max-width:600px){.nav nav{gap:16px}.nav nav .txt{display:none}.badge{top:-18px}.stage{padding-right:10px}.frame{box-shadow:8px 8px 0 var(--pink),-3px -3px 0 var(--lime);border-width:4px;border-radius:16px}}
 </style>
@@ -244,8 +248,7 @@ footer .by span{color:var(--lime);font-weight:600}
 
   <section class="max" aria-label="The wall">
   <div class="bench">
-    <div class="bench-main">
-    <div class="stage">
+<div class="stage">
       <p class="badge" aria-hidden="true">Your X banner</p>
       <div class="frame" id="frame">
         <canvas id="wall" width="1500" height="500"></canvas>
@@ -254,22 +257,15 @@ footer .by span{color:var(--lime);font-weight:600}
         <canvas id="overlay" width="1500" height="500"></canvas>
       </div>
     </div>
-    <div class="under">
-      <p class="hint"><span id="hint"><strong>Hold to spray.</strong> Linger in one spot and it drips. When the can sputters, shake it.</span>
-      <span class="keys"><kbd>S</kbd> shake &nbsp; <kbd>Z</kbd> undo &nbsp; <kbd>[</kbd> <kbd>]</kbd> size &nbsp; <kbd>Q</kbd> <kbd>E</kbd> turn sticker or stencil &nbsp; <kbd>-</kbd> <kbd>+</kbd> flow</span></p>
-      <div class="row" id="stencilBar" hidden><button class="save" id="liftBtn" type="button">Lift stencil</button><button class="pill" id="moveBtn" type="button" style="font:inherit;font-weight:700;cursor:pointer">Move stencil</button></div>
-      <div class="row" id="stickBar" hidden><label class="turn" for="turn"><span>Turn</span><input id="turn" type="range" min="-180" max="180" value="0" step="1"></label><button class="save" id="stickIt" type="button">Stick it</button><button class="pill" id="stickCancel" type="button" style="font:inherit;font-weight:700;cursor:pointer">Cancel</button></div>
-      <button class="save" id="saveBtn" type="button">Save X banner</button>
-    </div>
-    </div>
-    <aside class="dock" aria-label="Paint and stencils">
+<aside class="dock" aria-label="Paint">
       <div class="dock-paint">
         <h3>Paint</h3>
         <div class="row" id="caps"></div>
         <h3>Nozzle</h3>
         <div class="row" id="nozzles"></div>
       </div>
-    <div class="tray" id="tray" role="region" aria-label="Face stencils">
+    </aside>
+<div class="tray" id="tray" role="region" aria-label="Face stencils">
       <div class="tray-top">
         <h2 class="tray-heading" id="faceStencilHead"><img class="tray-title-img" src="hdr-face-stencils.webp" alt="Face stencils" width="900" height="243" decoding="async"></h2><span class="sr">Stencils</span>
         <div class="row" id="stencilTabs" role="group" aria-label="Stencil type">
@@ -289,10 +285,14 @@ footer .by span{color:var(--lime);font-weight:600}
         <button class="sbtn" id="stripR" type="button" aria-label="Scroll stencils right">›</button>
       </div>
     </div>
-  </section>
-    </aside>
+<div class="under">
+      <p class="hint"><span id="hint"><strong>Hold to spray.</strong> Linger in one spot and it drips. When the can sputters, shake it.</span>
+      <span class="keys"><kbd>S</kbd> shake &nbsp; <kbd>Z</kbd> undo &nbsp; <kbd>[</kbd> <kbd>]</kbd> size &nbsp; <kbd>Q</kbd> <kbd>E</kbd> turn sticker or stencil &nbsp; <kbd>-</kbd> <kbd>+</kbd> flow</span></p>
+      <div class="row" id="stencilBar" hidden><button class="save" id="liftBtn" type="button">Lift stencil</button><button class="pill" id="moveBtn" type="button" style="font:inherit;font-weight:700;cursor:pointer">Move stencil</button></div>
+      <div class="row" id="stickBar" hidden><label class="turn" for="turn"><span>Turn</span><input id="turn" type="range" min="-180" max="180" value="0" step="1"></label><button class="save" id="stickIt" type="button">Stick it</button><button class="pill" id="stickCancel" type="button" style="font:inherit;font-weight:700;cursor:pointer">Cancel</button></div>
+      <button class="save" id="saveBtn" type="button">Save X banner</button>
+    </div>
   </div>
-  </section>
 
   <section class="max tools" aria-label="Tools">
     <div class="card pink">
@@ -1757,7 +1757,7 @@ renderWall();updateGauge();requestAnimationFrame(loop);
   function overlap(a,b){return a.left<b.right-1&&a.right>b.left+1&&a.top<b.bottom-1&&a.bottom>b.top+1}
   function boxes(){
     var list=[];
-    ['#saveBtn','#undoBtn','#buffBtn','#shakeBtn','#liftBtn','#stickIt','#mClose'].forEach(function(sel){
+    ['#saveBtn','#tray','#undoBtn','#buffBtn','#shakeBtn','#liftBtn','#stickIt','#mClose'].forEach(function(sel){
       var el=document.querySelector(sel);
       if(!el||el.closest('[hidden]')) return;
       var r=el.getBoundingClientRect();
